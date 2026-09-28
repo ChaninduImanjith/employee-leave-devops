@@ -15,7 +15,8 @@ public class LeaveRequestController {
 
     private final LeaveRequestService leaveRequestService;
 
-    public LeaveRequestController(LeaveRequestService leaveRequestService) {
+    public LeaveRequestController(
+            LeaveRequestService leaveRequestService) {
         this.leaveRequestService = leaveRequestService;
     }
 
@@ -24,44 +25,73 @@ public class LeaveRequestController {
             @Valid @RequestBody LeaveRequest leaveRequest) {
 
         LeaveRequest createdRequest =
-                leaveRequestService.createLeaveRequest(leaveRequest);
+                leaveRequestService.createLeaveRequest(
+                        leaveRequest
+                );
 
         return ResponseEntity.ok(createdRequest);
     }
 
     @GetMapping
-    public ResponseEntity<List<LeaveRequest>> getAllLeaveRequests() {
+    public ResponseEntity<List<LeaveRequest>>
+    getAllLeaveRequests() {
+
         return ResponseEntity.ok(
                 leaveRequestService.getAllLeaveRequests()
         );
     }
 
+    @GetMapping("/employee/{employeeId}")
+    public ResponseEntity<List<LeaveRequest>>
+    getLeaveRequestsByEmployeeId(
+            @PathVariable String employeeId) {
+
+        return ResponseEntity.ok(
+                leaveRequestService
+                        .getLeaveRequestsByEmployeeId(
+                                employeeId
+                        )
+        );
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<LeaveRequest> getLeaveRequestById(
+    public ResponseEntity<LeaveRequest>
+    getLeaveRequestById(
             @PathVariable Long id) {
 
-        return leaveRequestService.getLeaveRequestById(id)
+        return leaveRequestService
+                .getLeaveRequestById(id)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElse(
+                        ResponseEntity.notFound().build()
+                );
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<LeaveRequest> updateLeaveRequest(
+    public ResponseEntity<LeaveRequest>
+    updateLeaveRequest(
             @PathVariable Long id,
             @Valid @RequestBody LeaveRequest leaveRequest) {
 
         return ResponseEntity.ok(
-                leaveRequestService.updateLeaveRequest(id, leaveRequest)
+                leaveRequestService.updateLeaveRequest(
+                        id,
+                        leaveRequest
+                )
         );
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<LeaveRequest> updateLeaveStatus(
+    public ResponseEntity<LeaveRequest>
+    updateLeaveStatus(
             @PathVariable Long id,
             @RequestParam String status) {
 
         return ResponseEntity.ok(
-                leaveRequestService.updateStatus(id, status)
+                leaveRequestService.updateStatus(
+                        id,
+                        status
+                )
         );
     }
 

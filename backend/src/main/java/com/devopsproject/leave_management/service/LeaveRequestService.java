@@ -13,11 +13,13 @@ public class LeaveRequestService {
 
     private final LeaveRequestRepository leaveRequestRepository;
 
-    public LeaveRequestService(LeaveRequestRepository leaveRequestRepository) {
+    public LeaveRequestService(
+            LeaveRequestRepository leaveRequestRepository) {
         this.leaveRequestRepository = leaveRequestRepository;
     }
 
-    public LeaveRequest createLeaveRequest(LeaveRequest leaveRequest) {
+    public LeaveRequest createLeaveRequest(
+            LeaveRequest leaveRequest) {
 
         validateDateRange(leaveRequest);
 
@@ -30,6 +32,12 @@ public class LeaveRequestService {
         return leaveRequestRepository.findAll();
     }
 
+    public List<LeaveRequest> getLeaveRequestsByEmployeeId(
+            String employeeId) {
+
+        return leaveRequestRepository.findByEmployeeId(employeeId);
+    }
+
     public Optional<LeaveRequest> getLeaveRequestById(Long id) {
         return leaveRequestRepository.findById(id);
     }
@@ -40,12 +48,14 @@ public class LeaveRequestService {
 
         validateDateRange(updatedRequest);
 
-        LeaveRequest existingRequest = leaveRequestRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Leave request not found with id: " + id
-                        )
-                );
+        LeaveRequest existingRequest =
+                leaveRequestRepository.findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Leave request not found with id: "
+                                                + id
+                                )
+                        );
 
         existingRequest.setEmployeeName(
                 updatedRequest.getEmployeeName()
@@ -82,12 +92,14 @@ public class LeaveRequestService {
             Long id,
             String status) {
 
-        LeaveRequest leaveRequest = leaveRequestRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Leave request not found with id: " + id
-                        )
-                );
+        LeaveRequest leaveRequest =
+                leaveRequestRepository.findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Leave request not found with id: "
+                                                + id
+                                )
+                        );
 
         String normalizedStatus = status.toUpperCase();
 
@@ -117,12 +129,13 @@ public class LeaveRequestService {
         leaveRequestRepository.deleteById(id);
     }
 
-    private void validateDateRange(LeaveRequest leaveRequest) {
+    private void validateDateRange(
+            LeaveRequest leaveRequest) {
 
         if (leaveRequest.getStartDate() != null
                 && leaveRequest.getEndDate() != null
                 && leaveRequest.getEndDate()
-                        .isBefore(leaveRequest.getStartDate())) {
+                .isBefore(leaveRequest.getStartDate())) {
 
             throw new IllegalArgumentException(
                     "End date cannot be before start date"
