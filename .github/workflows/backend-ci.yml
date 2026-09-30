@@ -41,6 +41,7 @@ jobs:
 
     env:
       DB_PASSWORD: ci_test_password_2026
+      JWT_SECRET: ${{ secrets.CI_JWT_SECRET }}
 
     steps:
       - name: Checkout source code
