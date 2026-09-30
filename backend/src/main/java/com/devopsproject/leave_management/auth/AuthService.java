@@ -2,6 +2,7 @@ package com.devopsproject.leave_management.auth;
 
 import com.devopsproject.leave_management.auth.dto.LoginRequest;
 import com.devopsproject.leave_management.auth.dto.LoginResponse;
+import com.devopsproject.leave_management.security.JwtService;
 import com.devopsproject.leave_management.user.UserAccount;
 import com.devopsproject.leave_management.user.UserAccountRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,13 +13,16 @@ public class AuthService {
 
     private final UserAccountRepository userAccountRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public AuthService(
             UserAccountRepository userAccountRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService) {
 
         this.userAccountRepository = userAccountRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public LoginResponse login(LoginRequest request) {
@@ -46,13 +50,17 @@ public class AuthService {
             );
         }
 
+        String accessToken =
+                jwtService.generateToken(user);
+
         return new LoginResponse(
                 user.getId(),
                 user.getFullName(),
                 user.getEmail(),
                 user.getEmployeeId(),
                 user.getDepartment(),
-                user.getRole()
+                user.getRole(),
+                accessToken
         );
     }
 }
