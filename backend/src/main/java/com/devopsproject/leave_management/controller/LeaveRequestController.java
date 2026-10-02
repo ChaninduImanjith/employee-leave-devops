@@ -4,6 +4,8 @@ import com.devopsproject.leave_management.entity.LeaveRequest;
 import com.devopsproject.leave_management.service.LeaveRequestService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,16 +43,15 @@ public class LeaveRequestController {
         );
     }
 
-    @GetMapping("/employee/{employeeId}")
+    @GetMapping("/my")
     public ResponseEntity<List<LeaveRequest>>
-    getLeaveRequestsByEmployeeId(
-            @PathVariable String employeeId) {
+    getMyLeaveRequests(
+            @AuthenticationPrincipal Jwt jwt) {
 
         return ResponseEntity.ok(
-                leaveRequestService
-                        .getLeaveRequestsByEmployeeId(
-                                employeeId
-                        )
+                leaveRequestService.getMyLeaveRequests(
+                        jwt.getSubject()
+                )
         );
     }
 
