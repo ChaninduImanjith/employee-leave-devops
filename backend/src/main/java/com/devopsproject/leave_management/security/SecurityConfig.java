@@ -70,6 +70,16 @@ public class SecurityConfig {
 
                         .requestMatchers(
                                 HttpMethod.GET,
+                                "/api/leaves/my"
+                        ).hasRole("EMPLOYEE")
+
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/leaves"
+                        ).hasRole("EMPLOYEE")
+
+                        .requestMatchers(
+                                HttpMethod.GET,
                                 "/api/leaves"
                         ).hasRole("ADMIN")
 
@@ -85,23 +95,13 @@ public class SecurityConfig {
 
                         .requestMatchers(
                                 HttpMethod.GET,
-                                "/api/leaves/employee/**"
-                        ).hasRole("EMPLOYEE")
-
-                        .requestMatchers(
-                                HttpMethod.POST,
-                                "/api/leaves"
-                        ).hasRole("EMPLOYEE")
+                                "/api/leaves/*"
+                        ).hasRole("ADMIN")
 
                         .requestMatchers(
                                 HttpMethod.PUT,
                                 "/api/leaves/**"
                         ).denyAll()
-
-                        .requestMatchers(
-                                HttpMethod.GET,
-                                "/api/leaves/*"
-                        ).hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )
