@@ -3,6 +3,8 @@ package com.devopsproject.leave_management.service;
 import com.devopsproject.leave_management.entity.LeaveRequest;
 import com.devopsproject.leave_management.exception.ResourceNotFoundException;
 import com.devopsproject.leave_management.repository.LeaveRequestRepository;
+import com.devopsproject.leave_management.user.UserAccount;
+import com.devopsproject.leave_management.user.UserAccountRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,10 +14,14 @@ import java.util.Optional;
 public class LeaveRequestService {
 
     private final LeaveRequestRepository leaveRequestRepository;
+    private final UserAccountRepository userAccountRepository;
 
     public LeaveRequestService(
-            LeaveRequestRepository leaveRequestRepository) {
+            LeaveRequestRepository leaveRequestRepository,
+            UserAccountRepository userAccountRepository) {
+
         this.leaveRequestRepository = leaveRequestRepository;
+        this.userAccountRepository = userAccountRepository;
     }
 
     public LeaveRequest createLeaveRequest(
@@ -36,6 +42,30 @@ public class LeaveRequestService {
             String employeeId) {
 
         return leaveRequestRepository.findByEmployeeId(employeeId);
+    }
+
+    public List<LeaveRequest> getMyLeaveRequests(
+            String email) {
+
+        UserAccount user =
+                userAccountRepository.findByEmail(email)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Authenticated user account not found"
+                                )
+                        );
+
+        if (user.getEmployeeId() == null
+                || user.getEmployeeId().isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "Employee account does not have an employee ID"
+            );
+        }
+
+        return leaveRequestRepository.findByEmployeeId(
+                user.getEmployeeId()
+        );
     }
 
     public Optional<LeaveRequest> getLeaveRequestById(Long id) {
