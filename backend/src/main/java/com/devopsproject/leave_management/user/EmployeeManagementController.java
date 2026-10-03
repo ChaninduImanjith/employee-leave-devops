@@ -2,6 +2,7 @@ package com.devopsproject.leave_management.user;
 
 import com.devopsproject.leave_management.user.dto.CreateEmployeeRequest;
 import com.devopsproject.leave_management.user.dto.EmployeeResponse;
+import com.devopsproject.leave_management.user.dto.ResetEmployeePasswordRequest;
 import com.devopsproject.leave_management.user.dto.UpdateEmployeeRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -75,6 +76,17 @@ public class EmployeeManagementController {
         return ResponseEntity.ok(
                 employeeManagementService
                         .setEmployeeEnabled(id, enabled)
+        );
+    }
+
+    @PatchMapping("/{id}/password")
+    public ResponseEntity<EmployeeResponse> resetEmployeePassword(
+            @PathVariable Long id,
+            @Valid @RequestBody ResetEmployeePasswordRequest request) {
+
+        return ResponseEntity.ok(
+                employeeManagementService
+                        .resetEmployeePassword(id, request)
         );
     }
 }
