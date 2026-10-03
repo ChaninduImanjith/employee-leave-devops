@@ -2,6 +2,7 @@ package com.devopsproject.leave_management.user;
 
 import com.devopsproject.leave_management.user.dto.CreateEmployeeRequest;
 import com.devopsproject.leave_management.user.dto.EmployeeResponse;
+import com.devopsproject.leave_management.user.dto.UpdateEmployeeRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +43,38 @@ public class EmployeeManagementController {
         return ResponseEntity.ok(
                 employeeManagementService
                         .getAllEmployees()
+        );
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<EmployeeResponse> getEmployeeById(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                employeeManagementService
+                        .getEmployeeById(id)
+        );
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<EmployeeResponse> updateEmployee(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateEmployeeRequest request) {
+
+        return ResponseEntity.ok(
+                employeeManagementService
+                        .updateEmployee(id, request)
+        );
+    }
+
+    @PatchMapping("/{id}/enabled")
+    public ResponseEntity<EmployeeResponse> setEmployeeEnabled(
+            @PathVariable Long id,
+            @RequestParam boolean enabled) {
+
+        return ResponseEntity.ok(
+                employeeManagementService
+                        .setEmployeeEnabled(id, enabled)
         );
     }
 }
