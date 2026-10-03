@@ -17,6 +17,7 @@ function EmployeeDashboard() {
   const {
     user,
     accessToken,
+    logout,
   } = useAuth();
 
   const [requests, setRequests] = useState([]);
@@ -127,6 +128,13 @@ function EmployeeDashboard() {
           Apply for leave and track the status of your
           requests.
         </p>
+
+        <button
+          type="button"
+          onClick={logout}
+        >
+          Logout
+        </button>
       </section>
 
       {message && (
