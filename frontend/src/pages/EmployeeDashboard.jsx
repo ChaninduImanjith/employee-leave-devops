@@ -1,30 +1,46 @@
-import { useCallback, useEffect, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
+
 import LeaveForm from "../components/LeaveForm";
 import EmployeeLeaveTable from "../components/EmployeeLeaveTable";
+import { useAuth } from "../context/AuthContext";
+
 import {
   createLeaveRequest,
-  getEmployeeLeaveRequests,
+  getMyLeaveRequests,
 } from "../services/leaveService";
 
-const employee = {
-  employeeName: "John Silva",
-  employeeId: "EMP001",
-  department: "IT",
-};
-
 function EmployeeDashboard() {
+  const {
+    user,
+    accessToken,
+  } = useAuth();
+
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState(null);
 
+  const employee = {
+    employeeName: user?.fullName || "",
+    employeeId: user?.employeeId || "",
+    department: user?.department || "",
+  };
+
   const loadRequests = useCallback(async () => {
+    if (!accessToken) {
+      return;
+    }
+
     try {
       setLoading(true);
 
       const data =
-        await getEmployeeLeaveRequests(
-          employee.employeeId
+        await getMyLeaveRequests(
+          accessToken
         );
 
       setRequests(data);
@@ -36,7 +52,7 @@ function EmployeeDashboard() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [accessToken]);
 
   useEffect(() => {
     loadRequests();
@@ -54,8 +70,18 @@ function EmployeeDashboard() {
     try {
       setSubmitting(true);
 
+      const secureRequest = {
+        leaveType: formData.leaveType,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        reason: formData.reason,
+      };
+
       const created =
-        await createLeaveRequest(formData);
+        await createLeaveRequest(
+          secureRequest,
+          accessToken
+        );
 
       setRequests((previous) => [
         created,
@@ -89,8 +115,14 @@ function EmployeeDashboard() {
   return (
     <main className="main-content">
       <section className="page-intro">
-        <p className="eyebrow">Employee Portal</p>
-        <h2>Welcome, {employee.employeeName}</h2>
+        <p className="eyebrow">
+          Employee Portal
+        </p>
+
+        <h2>
+          Welcome, {user?.fullName}
+        </h2>
+
         <p>
           Apply for leave and track the status of your
           requests.

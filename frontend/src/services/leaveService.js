@@ -28,23 +28,43 @@ async function handleResponse(response) {
   return response.json();
 }
 
-export async function getAllLeaveRequests() {
-  const response = await fetch(API_URL);
+function getAuthHeaders(accessToken) {
+  return {
+    Authorization: `Bearer ${accessToken}`,
+  };
+}
+
+export async function getAllLeaveRequests(
+  accessToken
+) {
+  const response = await fetch(API_URL, {
+    headers: getAuthHeaders(accessToken),
+  });
+
   return handleResponse(response);
 }
 
-export async function getEmployeeLeaveRequests(employeeId) {
+export async function getMyLeaveRequests(
+  accessToken
+) {
   const response = await fetch(
-    `${API_URL}/employee/${encodeURIComponent(employeeId)}`
+    `${API_URL}/my`,
+    {
+      headers: getAuthHeaders(accessToken),
+    }
   );
 
   return handleResponse(response);
 }
 
-export async function createLeaveRequest(leaveRequest) {
+export async function createLeaveRequest(
+  leaveRequest,
+  accessToken
+) {
   const response = await fetch(API_URL, {
     method: "POST",
     headers: {
+      ...getAuthHeaders(accessToken),
       "Content-Type": "application/json",
     },
     body: JSON.stringify(leaveRequest),
@@ -53,21 +73,35 @@ export async function createLeaveRequest(leaveRequest) {
   return handleResponse(response);
 }
 
-export async function updateLeaveStatus(id, status) {
+export async function updateLeaveStatus(
+  id,
+  status,
+  accessToken
+) {
   const response = await fetch(
-    `${API_URL}/${id}/status?status=${encodeURIComponent(status)}`,
+    `${API_URL}/${id}/status?status=${encodeURIComponent(
+      status
+    )}`,
     {
       method: "PATCH",
+      headers: getAuthHeaders(accessToken),
     }
   );
 
   return handleResponse(response);
 }
 
-export async function deleteLeaveRequest(id) {
-  const response = await fetch(`${API_URL}/${id}`, {
-    method: "DELETE",
-  });
+export async function deleteLeaveRequest(
+  id,
+  accessToken
+) {
+  const response = await fetch(
+    `${API_URL}/${id}`,
+    {
+      method: "DELETE",
+      headers: getAuthHeaders(accessToken),
+    }
+  );
 
   return handleResponse(response);
 }
