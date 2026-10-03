@@ -1,9 +1,12 @@
 package com.devopsproject.leave_management.auth;
 
+import com.devopsproject.leave_management.auth.dto.CurrentUserResponse;
 import com.devopsproject.leave_management.auth.dto.LoginRequest;
 import com.devopsproject.leave_management.auth.dto.LoginResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,6 +26,17 @@ public class AuthController {
 
         return ResponseEntity.ok(
                 authService.login(request)
+        );
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<CurrentUserResponse> getCurrentUser(
+            @AuthenticationPrincipal Jwt jwt) {
+
+        return ResponseEntity.ok(
+                authService.getCurrentUser(
+                        jwt.getSubject()
+                )
         );
     }
 }
