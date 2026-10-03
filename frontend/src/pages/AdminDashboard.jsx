@@ -1,5 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
+
 import AdminLeaveTable from "../components/AdminLeaveTable";
+import { useAuth } from "../context/AuthContext";
+
 import {
   deleteLeaveRequest,
   getAllLeaveRequests,
@@ -7,16 +14,29 @@ import {
 } from "../services/leaveService";
 
 function AdminDashboard() {
+  const {
+    user,
+    accessToken,
+    logout,
+  } = useAuth();
+
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionId, setActionId] = useState(null);
   const [message, setMessage] = useState(null);
 
   const loadRequests = useCallback(async () => {
+    if (!accessToken) {
+      return;
+    }
+
     try {
       setLoading(true);
 
-      const data = await getAllLeaveRequests();
+      const data =
+        await getAllLeaveRequests(
+          accessToken
+        );
 
       setRequests(data);
     } catch (error) {
@@ -27,7 +47,7 @@ function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [accessToken]);
 
   useEffect(() => {
     loadRequests();
@@ -49,7 +69,11 @@ function AdminDashboard() {
       setActionId(id);
 
       const updated =
-        await updateLeaveStatus(id, status);
+        await updateLeaveStatus(
+          id,
+          status,
+          accessToken
+        );
 
       setRequests((previous) =>
         previous.map((request) =>
@@ -82,7 +106,10 @@ function AdminDashboard() {
     try {
       setActionId(id);
 
-      await deleteLeaveRequest(id);
+      await deleteLeaveRequest(
+        id,
+        accessToken
+      );
 
       setRequests((previous) =>
         previous.filter(
@@ -119,11 +146,25 @@ function AdminDashboard() {
   return (
     <main className="main-content">
       <section className="page-intro">
-        <p className="eyebrow">HR Administration</p>
-        <h2>Leave Management Dashboard</h2>
-        <p>
-          Review and manage employee leave requests.
+        <p className="eyebrow">
+          HR Administration
         </p>
+
+        <h2>
+          Leave Management Dashboard
+        </h2>
+
+        <p>
+          Welcome, {user?.fullName}. Review and manage
+          employee leave requests.
+        </p>
+
+        <button
+          type="button"
+          onClick={logout}
+        >
+          Logout
+        </button>
       </section>
 
       {message && (
