@@ -1,5 +1,6 @@
 package com.devopsproject.leave_management.controller;
 
+import com.devopsproject.leave_management.dto.CreateLeaveRequestRequest;
 import com.devopsproject.leave_management.entity.LeaveRequest;
 import com.devopsproject.leave_management.service.LeaveRequestService;
 import jakarta.validation.Valid;
@@ -24,14 +25,15 @@ public class LeaveRequestController {
 
     @PostMapping
     public ResponseEntity<LeaveRequest> createLeaveRequest(
-            @Valid @RequestBody LeaveRequest leaveRequest) {
+            @Valid @RequestBody CreateLeaveRequestRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
 
-        LeaveRequest createdRequest =
+        return ResponseEntity.ok(
                 leaveRequestService.createLeaveRequest(
-                        leaveRequest
-                );
-
-        return ResponseEntity.ok(createdRequest);
+                        request,
+                        jwt.getSubject()
+                )
+        );
     }
 
     @GetMapping
@@ -63,23 +65,7 @@ public class LeaveRequestController {
         return leaveRequestService
                 .getLeaveRequestById(id)
                 .map(ResponseEntity::ok)
-                .orElse(
-                        ResponseEntity.notFound().build()
-                );
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<LeaveRequest>
-    updateLeaveRequest(
-            @PathVariable Long id,
-            @Valid @RequestBody LeaveRequest leaveRequest) {
-
-        return ResponseEntity.ok(
-                leaveRequestService.updateLeaveRequest(
-                        id,
-                        leaveRequest
-                )
-        );
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PatchMapping("/{id}/status")

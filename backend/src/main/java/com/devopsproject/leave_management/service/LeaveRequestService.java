@@ -1,5 +1,6 @@
 package com.devopsproject.leave_management.service;
 
+import com.devopsproject.leave_management.dto.CreateLeaveRequestRequest;
 import com.devopsproject.leave_management.entity.LeaveRequest;
 import com.devopsproject.leave_management.exception.ResourceNotFoundException;
 import com.devopsproject.leave_management.repository.LeaveRequestRepository;
@@ -25,11 +26,23 @@ public class LeaveRequestService {
     }
 
     public LeaveRequest createLeaveRequest(
-            LeaveRequest leaveRequest) {
+            CreateLeaveRequestRequest request,
+            String email) {
+
+        UserAccount user = getAuthenticatedEmployee(email);
+
+        LeaveRequest leaveRequest = new LeaveRequest();
+
+        leaveRequest.setEmployeeName(user.getFullName());
+        leaveRequest.setEmployeeId(user.getEmployeeId());
+        leaveRequest.setDepartment(user.getDepartment());
+        leaveRequest.setLeaveType(request.getLeaveType());
+        leaveRequest.setStartDate(request.getStartDate());
+        leaveRequest.setEndDate(request.getEndDate());
+        leaveRequest.setReason(request.getReason());
+        leaveRequest.setStatus("PENDING");
 
         validateDateRange(leaveRequest);
-
-        leaveRequest.setStatus("PENDING");
 
         return leaveRequestRepository.save(leaveRequest);
     }
@@ -47,21 +60,7 @@ public class LeaveRequestService {
     public List<LeaveRequest> getMyLeaveRequests(
             String email) {
 
-        UserAccount user =
-                userAccountRepository.findByEmail(email)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Authenticated user account not found"
-                                )
-                        );
-
-        if (user.getEmployeeId() == null
-                || user.getEmployeeId().isBlank()) {
-
-            throw new IllegalArgumentException(
-                    "Employee account does not have an employee ID"
-            );
-        }
+        UserAccount user = getAuthenticatedEmployee(email);
 
         return leaveRequestRepository.findByEmployeeId(
                 user.getEmployeeId()
@@ -157,6 +156,28 @@ public class LeaveRequestService {
         }
 
         leaveRequestRepository.deleteById(id);
+    }
+
+    private UserAccount getAuthenticatedEmployee(
+            String email) {
+
+        UserAccount user =
+                userAccountRepository.findByEmail(email)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Authenticated user account not found"
+                                )
+                        );
+
+        if (user.getEmployeeId() == null
+                || user.getEmployeeId().isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "Employee account does not have an employee ID"
+            );
+        }
+
+        return user;
     }
 
     private void validateDateRange(
