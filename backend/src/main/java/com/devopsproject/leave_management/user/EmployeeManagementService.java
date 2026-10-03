@@ -3,6 +3,7 @@ package com.devopsproject.leave_management.user;
 import com.devopsproject.leave_management.exception.ResourceNotFoundException;
 import com.devopsproject.leave_management.user.dto.CreateEmployeeRequest;
 import com.devopsproject.leave_management.user.dto.EmployeeResponse;
+import com.devopsproject.leave_management.user.dto.ResetEmployeePasswordRequest;
 import com.devopsproject.leave_management.user.dto.UpdateEmployeeRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -152,6 +153,25 @@ public class EmployeeManagementService {
                 getEmployeeEntityById(id);
 
         employee.setEnabled(enabled);
+
+        UserAccount updatedEmployee =
+                userAccountRepository.save(employee);
+
+        return toEmployeeResponse(updatedEmployee);
+    }
+
+    public EmployeeResponse resetEmployeePassword(
+            Long id,
+            ResetEmployeePasswordRequest request) {
+
+        UserAccount employee =
+                getEmployeeEntityById(id);
+
+        employee.setPassword(
+                passwordEncoder.encode(
+                        request.getTemporaryPassword()
+                )
+        );
 
         UserAccount updatedEmployee =
                 userAccountRepository.save(employee);
