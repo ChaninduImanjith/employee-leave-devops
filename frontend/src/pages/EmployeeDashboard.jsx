@@ -1,12 +1,11 @@
 import {
-  useCallback,
   useEffect,
   useState,
 } from "react";
 
 import LeaveForm from "../components/LeaveForm";
 import EmployeeLeaveTable from "../components/EmployeeLeaveTable";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 import {
   createLeaveRequest,
@@ -31,33 +30,37 @@ function EmployeeDashboard() {
     department: user?.department || "",
   };
 
-  const loadRequests = useCallback(async () => {
-    if (!accessToken) {
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const data =
-        await getMyLeaveRequests(
-          accessToken
-        );
-
-      setRequests(data);
-    } catch (error) {
-      setMessage({
-        type: "error",
-        text: error.message,
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [accessToken]);
-
   useEffect(() => {
-    loadRequests();
-  }, [loadRequests]);
+    if (!accessToken) {
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    getMyLeaveRequests(accessToken)
+      .then((data) => {
+        if (!cancelled) {
+          setRequests(data);
+        }
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          setMessage({
+            type: "error",
+            text: error.message,
+          });
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [accessToken]);
 
   const showMessage = (type, text) => {
     setMessage({ type, text });

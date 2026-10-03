@@ -1,16 +1,14 @@
 import {
-  createContext,
-  useContext,
   useEffect,
   useState,
 } from "react";
 
+import AuthContext from "./authContext";
+
 import {
   getCurrentUser,
-  login,
+  login as loginRequest,
 } from "../services/authService";
-
-const AuthContext = createContext(null);
 
 const TOKEN_KEY = "leaveflow_access_token";
 
@@ -20,34 +18,51 @@ export function AuthProvider({ children }) {
   );
 
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+
+  const [loading, setLoading] = useState(
+    () => Boolean(
+      sessionStorage.getItem(TOKEN_KEY)
+    )
+  );
 
   useEffect(() => {
-    async function restoreSession() {
-      if (!accessToken) {
-        setLoading(false);
-        return;
-      }
+    if (!accessToken) {
+      return undefined;
+    }
 
+    let cancelled = false;
+
+    async function restoreSession() {
       try {
         const currentUser =
           await getCurrentUser(accessToken);
 
-        setUser(currentUser);
+        if (!cancelled) {
+          setUser(currentUser);
+        }
       } catch {
-        sessionStorage.removeItem(TOKEN_KEY);
-        setAccessToken(null);
-        setUser(null);
+        if (!cancelled) {
+          sessionStorage.removeItem(TOKEN_KEY);
+          setAccessToken(null);
+          setUser(null);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
-    restoreSession();
+    void restoreSession();
+
+    return () => {
+      cancelled = true;
+    };
   }, [accessToken]);
 
   async function loginUser(email, password) {
-    const response = await login(email, password);
+    const response =
+      await loginRequest(email, password);
 
     sessionStorage.setItem(
       TOKEN_KEY,
@@ -66,6 +81,7 @@ export function AuthProvider({ children }) {
     };
 
     setUser(authenticatedUser);
+    setLoading(false);
 
     return authenticatedUser;
   }
@@ -74,6 +90,7 @@ export function AuthProvider({ children }) {
     sessionStorage.removeItem(TOKEN_KEY);
     setAccessToken(null);
     setUser(null);
+    setLoading(false);
   }
 
   const value = {
@@ -92,16 +109,4 @@ export function AuthProvider({ children }) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error(
-      "useAuth must be used inside AuthProvider"
-    );
-  }
-
-  return context;
 }

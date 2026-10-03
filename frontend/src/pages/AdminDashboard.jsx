@@ -1,11 +1,10 @@
 import {
-  useCallback,
   useEffect,
   useState,
 } from "react";
 
 import AdminLeaveTable from "../components/AdminLeaveTable";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 import {
   deleteLeaveRequest,
@@ -25,33 +24,37 @@ function AdminDashboard() {
   const [actionId, setActionId] = useState(null);
   const [message, setMessage] = useState(null);
 
-  const loadRequests = useCallback(async () => {
-    if (!accessToken) {
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const data =
-        await getAllLeaveRequests(
-          accessToken
-        );
-
-      setRequests(data);
-    } catch (error) {
-      setMessage({
-        type: "error",
-        text: error.message,
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [accessToken]);
-
   useEffect(() => {
-    loadRequests();
-  }, [loadRequests]);
+    if (!accessToken) {
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    getAllLeaveRequests(accessToken)
+      .then((data) => {
+        if (!cancelled) {
+          setRequests(data);
+        }
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          setMessage({
+            type: "error",
+            text: error.message,
+          });
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [accessToken]);
 
   const showMessage = (type, text) => {
     setMessage({ type, text });
