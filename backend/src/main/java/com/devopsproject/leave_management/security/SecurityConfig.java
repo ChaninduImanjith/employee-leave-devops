@@ -47,17 +47,13 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
-
                 .cors(Customizer.withDefaults())
-
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
                         )
                 )
-
                 .authorizeHttpRequests(auth -> auth
-
                         .requestMatchers(
                                 HttpMethod.OPTIONS,
                                 "/**"
@@ -67,6 +63,11 @@ public class SecurityConfig {
                                 HttpMethod.POST,
                                 "/api/auth/login"
                         ).permitAll()
+
+                        .requestMatchers(
+                                "/api/users/employees",
+                                "/api/users/employees/**"
+                        ).hasRole("ADMIN")
 
                         .requestMatchers(
                                 HttpMethod.GET,
@@ -105,7 +106,6 @@ public class SecurityConfig {
 
                         .anyRequest().authenticated()
                 )
-
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwt ->
                                 jwt.jwtAuthenticationConverter(
