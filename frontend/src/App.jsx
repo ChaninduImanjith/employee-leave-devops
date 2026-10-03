@@ -1,89 +1,61 @@
 import {
   Navigate,
-  NavLink,
   Route,
   Routes,
 } from "react-router-dom";
-import "./App.css";
-import EmployeeDashboard from "./pages/EmployeeDashboard";
+
+import ProtectedRoute from "./components/ProtectedRoute";
 import AdminDashboard from "./pages/AdminDashboard";
+import EmployeeDashboard from "./pages/EmployeeDashboard";
+import LoginPage from "./pages/LoginPage";
 
-function App() {
+import "./App.css";
+
+export default function App() {
   return (
-    <div className="app-shell">
-      <header className="topbar">
-        <div className="brand">
-          <div className="brand-mark">LM</div>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <Navigate
+            to="/login"
+            replace
+          />
+        }
+      />
 
-          <div>
-            <h1>LeaveFlow</h1>
-            <p>Employee Leave Management</p>
-          </div>
-        </div>
+      <Route
+        path="/login"
+        element={<LoginPage />}
+      />
 
-        <nav className="navigation">
-          <NavLink
-            to="/employee"
-            className={({ isActive }) =>
-              isActive ? "nav-link active" : "nav-link"
-            }
-          >
-            Employee Portal
-          </NavLink>
+      <Route
+        path="/employee"
+        element={
+          <ProtectedRoute allowedRole="EMPLOYEE">
+            <EmployeeDashboard />
+          </ProtectedRoute>
+        }
+      />
 
-          <NavLink
-            to="/admin"
-            className={({ isActive }) =>
-              isActive ? "nav-link active" : "nav-link"
-            }
-          >
-            HR Admin
-          </NavLink>
-        </nav>
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute allowedRole="ADMIN">
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
 
-        <div className="environment-badge">
-          <span className="environment-dot"></span>
-          Development
-        </div>
-      </header>
-
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <Navigate
-              to="/employee"
-              replace
-            />
-          }
-        />
-
-        <Route
-          path="/employee"
-          element={<EmployeeDashboard />}
-        />
-
-        <Route
-          path="/admin"
-          element={<AdminDashboard />}
-        />
-
-        <Route
-          path="*"
-          element={
-            <Navigate
-              to="/employee"
-              replace
-            />
-          }
-        />
-      </Routes>
-
-      <footer>
-        Employee Leave Management System · DevOps Project
-      </footer>
-    </div>
+      <Route
+        path="*"
+        element={
+          <Navigate
+            to="/login"
+            replace
+          />
+        }
+      />
+    </Routes>
   );
 }
-
-export default App;
