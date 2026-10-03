@@ -1,7 +1,9 @@
 package com.devopsproject.leave_management.auth;
 
+import com.devopsproject.leave_management.auth.dto.CurrentUserResponse;
 import com.devopsproject.leave_management.auth.dto.LoginRequest;
 import com.devopsproject.leave_management.auth.dto.LoginResponse;
+import com.devopsproject.leave_management.exception.ResourceNotFoundException;
 import com.devopsproject.leave_management.security.JwtService;
 import com.devopsproject.leave_management.user.UserAccount;
 import com.devopsproject.leave_management.user.UserAccountRepository;
@@ -61,6 +63,27 @@ public class AuthService {
                 user.getDepartment(),
                 user.getRole(),
                 accessToken
+        );
+    }
+
+    public CurrentUserResponse getCurrentUser(
+            String email) {
+
+        UserAccount user = userAccountRepository
+                .findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Authenticated user account not found"
+                        )
+                );
+
+        return new CurrentUserResponse(
+                user.getId(),
+                user.getFullName(),
+                user.getEmail(),
+                user.getEmployeeId(),
+                user.getDepartment(),
+                user.getRole()
         );
     }
 }
