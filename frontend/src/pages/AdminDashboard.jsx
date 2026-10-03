@@ -4,6 +4,7 @@ import {
 } from "react";
 
 import AdminLeaveTable from "../components/AdminLeaveTable";
+import EmployeeManagement from "../components/EmployeeManagement";
 import { useAuth } from "../hooks/useAuth";
 
 import {
@@ -207,6 +208,8 @@ function AdminDashboard() {
         onStatusChange={handleStatusChange}
         onDelete={handleDelete}
       />
+
+      <EmployeeManagement />
     </main>
   );
 }
