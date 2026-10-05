@@ -1,5 +1,6 @@
 package com.devopsproject.leave_management.auth;
 
+import com.devopsproject.leave_management.auth.dto.ChangePasswordRequest;
 import com.devopsproject.leave_management.auth.dto.CurrentUserResponse;
 import com.devopsproject.leave_management.auth.dto.LoginRequest;
 import com.devopsproject.leave_management.auth.dto.LoginResponse;
@@ -66,6 +67,65 @@ public class AuthService {
                 accessToken
         );
     }
+
+    public CurrentUserResponse changePassword(
+            String email,
+            ChangePasswordRequest request) {
+
+        UserAccount user = userAccountRepository
+                .findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Authenticated user account not found"
+                        )
+                );
+
+        if (!user.isEnabled()) {
+            throw new IllegalArgumentException(
+                    "User account is disabled"
+            );
+        }
+
+        if (!passwordEncoder.matches(
+                request.getCurrentPassword(),
+                user.getPassword())) {
+
+            throw new IllegalArgumentException(
+                    "Current password is incorrect"
+            );
+        }
+
+        if (passwordEncoder.matches(
+                request.getNewPassword(),
+                user.getPassword())) {
+
+            throw new IllegalArgumentException(
+                    "New password must be different from current password"
+            );
+        }
+
+        user.setPassword(
+                passwordEncoder.encode(
+                        request.getNewPassword()
+                )
+        );
+
+        user.setMustChangePassword(false);
+
+        UserAccount updatedUser =
+                userAccountRepository.save(user);
+
+        return new CurrentUserResponse(
+                updatedUser.getId(),
+                updatedUser.getFullName(),
+                updatedUser.getEmail(),
+                updatedUser.getEmployeeId(),
+                updatedUser.getDepartment(),
+                updatedUser.getRole(),
+                updatedUser.isMustChangePassword()
+        );
+    }
+
 
     public CurrentUserResponse getCurrentUser(
             String email) {
