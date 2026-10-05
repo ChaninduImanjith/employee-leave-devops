@@ -1,5 +1,6 @@
 package com.devopsproject.leave_management.auth;
 
+import com.devopsproject.leave_management.auth.dto.ChangePasswordRequest;
 import com.devopsproject.leave_management.auth.dto.CurrentUserResponse;
 import com.devopsproject.leave_management.auth.dto.LoginRequest;
 import com.devopsproject.leave_management.auth.dto.LoginResponse;
@@ -28,6 +29,20 @@ public class AuthController {
                 authService.login(request)
         );
     }
+
+    @PatchMapping("/change-password")
+    public ResponseEntity<CurrentUserResponse> changePassword(
+            @AuthenticationPrincipal Jwt jwt,
+            @Valid @RequestBody ChangePasswordRequest request) {
+
+        return ResponseEntity.ok(
+                authService.changePassword(
+                        jwt.getSubject(),
+                        request
+                )
+        );
+    }
+
 
     @GetMapping("/me")
     public ResponseEntity<CurrentUserResponse> getCurrentUser(
