@@ -62,6 +62,7 @@ public class AuthService {
                 user.getEmployeeId(),
                 user.getDepartment(),
                 user.getRole(),
+                user.isMustChangePassword(),
                 accessToken
         );
     }
@@ -83,7 +84,8 @@ public class AuthService {
                 user.getEmail(),
                 user.getEmployeeId(),
                 user.getDepartment(),
-                user.getRole()
+                user.getRole(),
+                user.isMustChangePassword()
         );
     }
 }

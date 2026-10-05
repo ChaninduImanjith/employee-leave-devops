@@ -10,6 +10,7 @@ public class LoginResponse {
     private String employeeId;
     private String department;
     private Role role;
+    private boolean mustChangePassword;
     private String accessToken;
     private String tokenType;
 
@@ -28,6 +29,7 @@ public class LoginResponse {
                 employeeId,
                 department,
                 role,
+                false,
                 null
         );
     }
@@ -41,12 +43,36 @@ public class LoginResponse {
             Role role,
             String accessToken) {
 
+        this(
+                id,
+                fullName,
+                email,
+                employeeId,
+                department,
+                role,
+                false,
+                accessToken
+        );
+    }
+
+    public LoginResponse(
+            Long id,
+            String fullName,
+            String email,
+            String employeeId,
+            String department,
+            Role role,
+            boolean mustChangePassword,
+            String accessToken) {
+
         this.id = id;
         this.fullName = fullName;
         this.email = email;
         this.employeeId = employeeId;
         this.department = department;
         this.role = role;
+        this.mustChangePassword =
+                mustChangePassword;
         this.accessToken = accessToken;
         this.tokenType =
                 accessToken == null ? null : "Bearer";
@@ -74,6 +100,10 @@ public class LoginResponse {
 
     public Role getRole() {
         return role;
+    }
+
+    public boolean isMustChangePassword() {
+        return mustChangePassword;
     }
 
     public String getAccessToken() {
