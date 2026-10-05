@@ -68,6 +68,7 @@ public class EmployeeManagementService {
 
         employee.setRole(Role.EMPLOYEE);
         employee.setEnabled(true);
+        employee.setMustChangePassword(true);
 
         UserAccount savedEmployee =
                 userAccountRepository.save(employee);
@@ -172,6 +173,8 @@ public class EmployeeManagementService {
                         request.getTemporaryPassword()
                 )
         );
+
+        employee.setMustChangePassword(true);
 
         UserAccount updatedEmployee =
                 userAccountRepository.save(employee);
