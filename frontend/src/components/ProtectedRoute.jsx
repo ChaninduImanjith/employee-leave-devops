@@ -1,10 +1,16 @@
-import { Navigate } from "react-router-dom";
+import {
+  Navigate,
+  useLocation,
+} from "react-router-dom";
+
 import { useAuth } from "../hooks/useAuth";
 
 export default function ProtectedRoute({
   children,
   allowedRole,
 }) {
+  const location = useLocation();
+
   const {
     user,
     loading,
@@ -21,6 +27,18 @@ export default function ProtectedRoute({
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (
+    user?.mustChangePassword &&
+    location.pathname !== "/change-password"
+  ) {
+    return (
+      <Navigate
+        to="/change-password"
+        replace
+      />
+    );
   }
 
   if (

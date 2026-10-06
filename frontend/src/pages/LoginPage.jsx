@@ -29,9 +29,11 @@ export default function LoginPage() {
 
   if (isAuthenticated) {
     const target =
-      user?.role === "ADMIN"
-        ? "/admin"
-        : "/employee";
+      user?.mustChangePassword
+        ? "/change-password"
+        : user?.role === "ADMIN"
+          ? "/admin"
+          : "/employee";
 
     return <Navigate to={target} replace />;
   }
@@ -46,10 +48,21 @@ export default function LoginPage() {
       const authenticatedUser =
         await loginUser(email, password);
 
-      if (authenticatedUser.role === "ADMIN") {
-        navigate("/admin", { replace: true });
+      if (authenticatedUser.mustChangePassword) {
+        navigate(
+          "/change-password",
+          { replace: true }
+        );
+      } else if (
+        authenticatedUser.role === "ADMIN"
+      ) {
+        navigate("/admin", {
+          replace: true,
+        });
       } else {
-        navigate("/employee", { replace: true });
+        navigate("/employee", {
+          replace: true,
+        });
       }
     } catch (err) {
       setError(

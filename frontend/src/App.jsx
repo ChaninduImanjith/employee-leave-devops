@@ -6,6 +6,7 @@ import {
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminDashboard from "./pages/AdminDashboard";
+import ChangePasswordPage from "./pages/ChangePasswordPage";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
 import LoginPage from "./pages/LoginPage";
 
@@ -27,6 +28,15 @@ export default function App() {
       <Route
         path="/login"
         element={<LoginPage />}
+      />
+
+      <Route
+        path="/change-password"
+        element={
+          <ProtectedRoute>
+            <ChangePasswordPage />
+          </ProtectedRoute>
+        }
       />
 
       <Route
