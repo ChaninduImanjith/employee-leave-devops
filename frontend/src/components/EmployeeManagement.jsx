@@ -4,6 +4,7 @@ import {
 } from "react";
 
 import { useAuth } from "../hooks/useAuth";
+import ResetPasswordModal from "./ResetPasswordModal";
 
 import {
   createEmployee,
@@ -32,6 +33,11 @@ export default function EmployeeManagement() {
   const [submitting, setSubmitting] = useState(false);
   const [actionId, setActionId] = useState(null);
   const [message, setMessage] = useState(null);
+
+  const [
+    passwordResetEmployee,
+    setPasswordResetEmployee,
+  ] = useState(null);
 
   useEffect(() => {
     if (!accessToken) {
@@ -201,31 +207,26 @@ export default function EmployeeManagement() {
     }
   }
 
-  async function handlePasswordReset(employee) {
-    const temporaryPassword =
-      window.prompt(
-        `Enter a new temporary password for ${employee.fullName}:`
-      );
+  function handlePasswordReset(employee) {
+    setPasswordResetEmployee(employee);
+  }
 
-    if (!temporaryPassword) {
-      return;
-    }
-
-    if (temporaryPassword.length < 8) {
-      setMessage({
-        type: "error",
-        text: "Temporary password must contain at least 8 characters.",
-      });
-
+  async function handlePasswordResetSubmit(
+    temporaryPassword
+  ) {
+    if (!passwordResetEmployee) {
       return;
     }
 
     try {
-      setActionId(employee.id);
+      setActionId(
+        passwordResetEmployee.id
+      );
+
       setMessage(null);
 
       await resetEmployeePassword(
-        employee.id,
+        passwordResetEmployee.id,
         temporaryPassword,
         accessToken
       );
@@ -234,6 +235,8 @@ export default function EmployeeManagement() {
         type: "success",
         text: "Employee password reset successfully.",
       });
+
+      setPasswordResetEmployee(null);
     } catch (error) {
       setMessage({
         type: "error",
@@ -473,6 +476,20 @@ export default function EmployeeManagement() {
           </div>
         )}
       </div>
+    <ResetPasswordModal
+      employee={passwordResetEmployee}
+      submitting={
+        actionId ===
+        passwordResetEmployee?.id
+      }
+      onClose={() =>
+        setPasswordResetEmployee(null)
+      }
+      onSubmit={
+        handlePasswordResetSubmit
+      }
+    />
+
     </section>
   );
 }
