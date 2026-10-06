@@ -51,6 +51,7 @@ public class UserDataInitializer implements CommandLineRunner {
 
         admin.setFullName("HR Administrator");
         admin.setEmail("admin@leaveflow.com");
+        admin.setUsername("admin");
         admin.setPassword(
                 passwordEncoder.encode(adminPassword)
         );
@@ -76,6 +77,7 @@ public class UserDataInitializer implements CommandLineRunner {
 
         employee.setFullName("John Silva");
         employee.setEmail("employee@leaveflow.com");
+        employee.setUsername("john.silva");
         employee.setPassword(
                 passwordEncoder.encode(employeePassword)
         );
