@@ -247,6 +247,13 @@ export default function EmployeeManagement() {
     }
   }
 
+  const activeEmployees = employees.filter(
+    (employee) => employee.enabled
+  ).length;
+
+  const disabledEmployees =
+    employees.length - activeEmployees;
+
   return (
     <section className="employee-management">
       <div className="section-heading">
@@ -271,8 +278,25 @@ export default function EmployeeManagement() {
         </div>
       )}
 
+      <section className="employee-summary-grid">
+        <article className="employee-summary-card">
+          <span>Total Employees</span>
+          <strong>{employees.length}</strong>
+        </article>
+
+        <article className="employee-summary-card">
+          <span>Active Employees</span>
+          <strong>{activeEmployees}</strong>
+        </article>
+
+        <article className="employee-summary-card">
+          <span>Disabled Employees</span>
+          <strong>{disabledEmployees}</strong>
+        </article>
+      </section>
+
       <form
-        className="employee-form"
+        className="employee-form employee-form-card"
         onSubmit={handleSubmit}
       >
         <div>
@@ -379,7 +403,19 @@ export default function EmployeeManagement() {
       </form>
 
       <div className="employee-list-section">
-        <h2>Employees</h2>
+        <div className="employee-list-heading">
+          <div>
+            <p className="eyebrow">
+              Directory
+            </p>
+
+            <h2>Employees</h2>
+          </div>
+
+          <span className="employee-count-badge">
+            {employees.length} total
+          </span>
+        </div>
 
         {loading ? (
           <p>Loading employees...</p>
@@ -419,15 +455,24 @@ export default function EmployeeManagement() {
                     </td>
 
                     <td>
-                      {employee.enabled
-                        ? "Active"
-                        : "Disabled"}
+                      <span
+                        className={
+                          employee.enabled
+                            ? "employee-status-badge employee-status-active"
+                            : "employee-status-badge employee-status-disabled"
+                        }
+                      >
+                        {employee.enabled
+                          ? "Active"
+                          : "Disabled"}
+                      </span>
                     </td>
 
                     <td>
                       <div className="employee-actions">
                         <button
                           type="button"
+                          className="employee-action-button employee-action-edit"
                           onClick={() =>
                             handleEdit(employee)
                           }
@@ -440,6 +485,11 @@ export default function EmployeeManagement() {
 
                         <button
                           type="button"
+                          className={
+                            employee.enabled
+                              ? "employee-action-button employee-action-disable"
+                              : "employee-action-button employee-action-enable"
+                          }
                           onClick={() =>
                             handleEnabledChange(
                               employee
@@ -456,6 +506,7 @@ export default function EmployeeManagement() {
 
                         <button
                           type="button"
+                          className="employee-action-button employee-action-reset"
                           onClick={() =>
                             handlePasswordReset(
                               employee
