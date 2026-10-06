@@ -12,9 +12,13 @@ public interface UserAccountRepository
 
     Optional<UserAccount> findByEmail(String email);
 
+    Optional<UserAccount> findByUsername(String username);
+
     Optional<UserAccount> findByEmployeeId(String employeeId);
 
     boolean existsByEmail(String email);
+
+    boolean existsByUsername(String username);
 
     boolean existsByEmployeeId(String employeeId);
 

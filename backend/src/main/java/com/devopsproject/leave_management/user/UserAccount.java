@@ -13,6 +13,10 @@ import jakarta.persistence.*;
                 @UniqueConstraint(
                         name = "uk_users_employee_id",
                         columnNames = "employee_id"
+                ),
+                @UniqueConstraint(
+                        name = "uk_users_username",
+                        columnNames = "username"
                 )
         }
 )
@@ -27,6 +31,12 @@ public class UserAccount {
 
     @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(
+            unique = true,
+            length = 50
+    )
+    private String username;
 
     @Column(nullable = false)
     private String password;
@@ -74,6 +84,14 @@ public class UserAccount {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
