@@ -6,6 +6,7 @@ import {
 import AuthContext from "./authContext";
 
 import {
+  changePassword as changePasswordRequest,
   getCurrentUser,
   login as loginRequest,
 } from "../services/authService";
@@ -78,12 +79,36 @@ export function AuthProvider({ children }) {
       employeeId: response.employeeId,
       department: response.department,
       role: response.role,
+      mustChangePassword:
+        response.mustChangePassword,
     };
 
     setUser(authenticatedUser);
     setLoading(false);
 
     return authenticatedUser;
+  }
+
+  async function changePasswordUser(
+    currentPassword,
+    newPassword
+  ) {
+    if (!accessToken) {
+      throw new Error(
+        "Authentication is required"
+      );
+    }
+
+    const updatedUser =
+      await changePasswordRequest(
+        accessToken,
+        currentPassword,
+        newPassword
+      );
+
+    setUser(updatedUser);
+
+    return updatedUser;
   }
 
   function logout() {
@@ -101,6 +126,7 @@ export function AuthProvider({ children }) {
       user && accessToken
     ),
     loginUser,
+    changePasswordUser,
     logout,
   };
 

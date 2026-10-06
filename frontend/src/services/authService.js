@@ -48,3 +48,26 @@ export async function getCurrentUser(accessToken) {
 
   return handleResponse(response);
 }
+
+export async function changePassword(
+  accessToken,
+  currentPassword,
+  newPassword
+) {
+  const response = await fetch(
+    `${AUTH_API_URL}/change-password`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        currentPassword,
+        newPassword,
+      }),
+    }
+  );
+
+  return handleResponse(response);
+}
