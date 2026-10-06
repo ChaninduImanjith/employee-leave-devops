@@ -16,6 +16,7 @@ import {
 
 const emptyForm = {
   fullName: "",
+  username: "",
   email: "",
   employeeId: "",
   department: "",
@@ -98,6 +99,7 @@ export default function EmployeeManagement() {
             editingId,
             {
               fullName: form.fullName,
+            username: form.username,
               email: form.email,
               employeeId: form.employeeId,
               department: form.department,
@@ -122,6 +124,7 @@ export default function EmployeeManagement() {
           await createEmployee(
             {
               fullName: form.fullName,
+            username: form.username,
               email: form.email,
               employeeId: form.employeeId,
               department: form.department,
@@ -159,6 +162,7 @@ export default function EmployeeManagement() {
 
     setForm({
       fullName: employee.fullName,
+    username: employee.username,
       email: employee.email,
       employeeId: employee.employeeId,
       department: employee.department,
@@ -315,6 +319,26 @@ export default function EmployeeManagement() {
         </div>
 
         <div>
+          <label htmlFor="employee-username">
+            Username
+          </label>
+
+          <input
+            id="employee-username"
+            name="username"
+            type="text"
+            value={form.username}
+            onChange={handleChange}
+            placeholder="e.g. john.silva"
+            minLength={3}
+            maxLength={50}
+            pattern="[A-Za-z0-9._-]+"
+            autoComplete="username"
+            required
+          />
+        </div>
+
+        <div>
           <label htmlFor="employee-email">
             Email
           </label>
@@ -428,6 +452,7 @@ export default function EmployeeManagement() {
                 <tr>
                   <th>Employee ID</th>
                   <th>Name</th>
+                  <th>Username</th>
                   <th>Email</th>
                   <th>Department</th>
                   <th>Status</th>
@@ -444,6 +469,10 @@ export default function EmployeeManagement() {
 
                     <td>
                       {employee.fullName}
+                    </td>
+
+                    <td>
+                      {employee.username}
                     </td>
 
                     <td>
