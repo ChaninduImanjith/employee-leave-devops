@@ -30,12 +30,23 @@ public class EmployeeManagementService {
         String email =
                 request.getEmail().trim().toLowerCase();
 
+        String username =
+                request.getUsername().trim().toLowerCase();
+
         String employeeId =
                 request.getEmployeeId().trim();
 
         if (userAccountRepository.existsByEmail(email)) {
             throw new IllegalArgumentException(
                     "An account with this email already exists"
+            );
+        }
+
+        if (userAccountRepository.existsByUsername(
+                username)) {
+
+            throw new IllegalArgumentException(
+                    "An account with this username already exists"
             );
         }
 
@@ -54,6 +65,7 @@ public class EmployeeManagementService {
         );
 
         employee.setEmail(email);
+        employee.setUsername(username);
         employee.setEmployeeId(employeeId);
 
         employee.setDepartment(
@@ -104,6 +116,9 @@ public class EmployeeManagementService {
         String email =
                 request.getEmail().trim().toLowerCase();
 
+        String username =
+                request.getUsername().trim().toLowerCase();
+
         String employeeId =
                 request.getEmployeeId().trim();
 
@@ -115,6 +130,17 @@ public class EmployeeManagementService {
                 .ifPresent(existing -> {
                     throw new IllegalArgumentException(
                             "An account with this email already exists"
+                    );
+                });
+
+        userAccountRepository
+                .findByUsername(username)
+                .filter(existing ->
+                        !existing.getId().equals(id)
+                )
+                .ifPresent(existing -> {
+                    throw new IllegalArgumentException(
+                            "An account with this username already exists"
                     );
                 });
 
@@ -134,6 +160,7 @@ public class EmployeeManagementService {
         );
 
         employee.setEmail(email);
+        employee.setUsername(username);
         employee.setEmployeeId(employeeId);
 
         employee.setDepartment(
@@ -208,6 +235,7 @@ public class EmployeeManagementService {
         return new EmployeeResponse(
                 employee.getId(),
                 employee.getFullName(),
+                employee.getUsername(),
                 employee.getEmail(),
                 employee.getEmployeeId(),
                 employee.getDepartment(),

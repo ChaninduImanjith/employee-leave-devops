@@ -6,6 +6,7 @@ public class EmployeeResponse {
 
     private final Long id;
     private final String fullName;
+    private final String username;
     private final String email;
     private final String employeeId;
     private final String department;
@@ -15,6 +16,7 @@ public class EmployeeResponse {
     public EmployeeResponse(
             Long id,
             String fullName,
+            String username,
             String email,
             String employeeId,
             String department,
@@ -23,6 +25,7 @@ public class EmployeeResponse {
 
         this.id = id;
         this.fullName = fullName;
+        this.username = username;
         this.email = email;
         this.employeeId = employeeId;
         this.department = department;
@@ -36,6 +39,10 @@ public class EmployeeResponse {
 
     public String getFullName() {
         return fullName;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     public String getEmail() {
