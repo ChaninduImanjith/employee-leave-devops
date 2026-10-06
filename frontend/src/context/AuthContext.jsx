@@ -61,9 +61,15 @@ export function AuthProvider({ children }) {
     };
   }, [accessToken]);
 
-  async function loginUser(email, password) {
+  async function loginUser(
+    identifier,
+    password
+  ) {
     const response =
-      await loginRequest(email, password);
+      await loginRequest(
+        identifier,
+        password
+      );
 
     sessionStorage.setItem(
       TOKEN_KEY,

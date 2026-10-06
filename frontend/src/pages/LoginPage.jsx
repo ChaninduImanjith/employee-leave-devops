@@ -13,7 +13,8 @@ export default function LoginPage() {
     loginUser,
   } = useAuth();
 
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] =
+    useState("");
   const [password, setPassword] = useState("");
 
   const [error, setError] = useState("");
@@ -46,7 +47,10 @@ export default function LoginPage() {
 
     try {
       const authenticatedUser =
-        await loginUser(email, password);
+        await loginUser(
+          identifier,
+          password
+        );
 
       if (authenticatedUser.mustChangePassword) {
         navigate(
@@ -83,19 +87,21 @@ export default function LoginPage() {
         </p>
 
         <form onSubmit={handleSubmit}>
-          <label htmlFor="email">
-            Email
+          <label htmlFor="identifier">
+            Email or Username
           </label>
 
           <input
-            id="email"
-            type="email"
-            value={email}
+            id="identifier"
+            type="text"
+            value={identifier}
             onChange={(event) =>
-              setEmail(event.target.value)
+              setIdentifier(
+                event.target.value
+              )
             }
-            placeholder="you@example.com"
-            autoComplete="email"
+            placeholder="Email or username"
+            autoComplete="username"
             required
           />
 

@@ -24,14 +24,14 @@ async function handleResponse(response) {
   return response.json();
 }
 
-export async function login(email, password) {
+export async function login(identifier, password) {
   const response = await fetch(`${AUTH_API_URL}/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      email,
+      identifier,
       password,
     }),
   });
