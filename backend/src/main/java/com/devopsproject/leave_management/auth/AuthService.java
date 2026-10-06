@@ -30,11 +30,20 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest request) {
 
+        String identifier =
+                request.getIdentifier()
+                        .trim()
+                        .toLowerCase();
+
         UserAccount user = userAccountRepository
-                .findByEmail(request.getEmail())
+                .findByEmail(identifier)
+                .or(() ->
+                        userAccountRepository
+                                .findByUsername(identifier)
+                )
                 .orElseThrow(() ->
                         new IllegalArgumentException(
-                                "Invalid email or password"
+                                "Invalid username, email, or password"
                         )
                 );
 
@@ -49,7 +58,7 @@ public class AuthService {
                 user.getPassword())) {
 
             throw new IllegalArgumentException(
-                    "Invalid email or password"
+                    "Invalid username, email, or password"
             );
         }
 
