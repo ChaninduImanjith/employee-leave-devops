@@ -20,6 +20,9 @@ function AdminDashboard() {
     logout,
   } = useAuth();
 
+  const [activeSection, setActiveSection] =
+    useState("leaves");
+
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionId, setActionId] = useState(null);
@@ -92,7 +95,10 @@ function AdminDashboard() {
         `Leave request ${status.toLowerCase()} successfully.`
       );
     } catch (error) {
-      showMessage("error", error.message);
+      showMessage(
+        "error",
+        error.message
+      );
     } finally {
       setActionId(null);
     }
@@ -117,7 +123,8 @@ function AdminDashboard() {
 
       setRequests((previous) =>
         previous.filter(
-          (request) => request.id !== id
+          (request) =>
+            request.id !== id
         )
       );
 
@@ -126,7 +133,10 @@ function AdminDashboard() {
         "Leave request deleted successfully."
       );
     } catch (error) {
-      showMessage("error", error.message);
+      showMessage(
+        "error",
+        error.message
+      );
     } finally {
       setActionId(null);
     }
@@ -148,69 +158,211 @@ function AdminDashboard() {
   ).length;
 
   return (
-    <main className="main-content">
-      <section className="page-intro">
-        <p className="eyebrow">
-          HR Administration
-        </p>
+    <div className="admin-layout">
+      <aside className="admin-sidebar">
+        <div className="admin-brand">
+          <div className="admin-brand-mark">
+            LF
+          </div>
 
-        <h2>
-          Leave Management Dashboard
-        </h2>
-
-        <p>
-          Welcome, {user?.fullName}. Review and manage
-          employee leave requests.
-        </p>
-
-        <button
-          type="button"
-          onClick={logout}
-        >
-          Logout
-        </button>
-      </section>
-
-      {message && (
-        <div
-          className={`alert alert-${message.type}`}
-        >
-          {message.text}
+          <div>
+            <h1>LeaveFlow</h1>
+            <p>HR Management</p>
+          </div>
         </div>
-      )}
 
-      <section className="stats-grid">
-        <article className="stat-card">
-          <span>Total requests</span>
-          <strong>{requests.length}</strong>
-        </article>
+        <nav className="admin-navigation">
+          <p className="admin-nav-label">
+            Workspace
+          </p>
 
-        <article className="stat-card">
-          <span>Pending</span>
-          <strong>{pending}</strong>
-        </article>
+          <button
+            type="button"
+            className={
+              activeSection === "leaves"
+                ? "admin-nav-item active"
+                : "admin-nav-item"
+            }
+            onClick={() =>
+              setActiveSection("leaves")
+            }
+          >
+            <span className="admin-nav-icon">
+              ◫
+            </span>
 
-        <article className="stat-card">
-          <span>Approved</span>
-          <strong>{approved}</strong>
-        </article>
+            <span>Leave Requests</span>
 
-        <article className="stat-card">
-          <span>Rejected</span>
-          <strong>{rejected}</strong>
-        </article>
-      </section>
+            {pending > 0 && (
+              <span className="admin-nav-count">
+                {pending}
+              </span>
+            )}
+          </button>
 
-      <AdminLeaveTable
-        requests={requests}
-        loading={loading}
-        actionId={actionId}
-        onStatusChange={handleStatusChange}
-        onDelete={handleDelete}
-      />
+          <button
+            type="button"
+            className={
+              activeSection === "employees"
+                ? "admin-nav-item active"
+                : "admin-nav-item"
+            }
+            onClick={() =>
+              setActiveSection("employees")
+            }
+          >
+            <span className="admin-nav-icon">
+              ♙
+            </span>
 
-      <EmployeeManagement />
-    </main>
+            <span>Employees</span>
+          </button>
+        </nav>
+
+        <div className="admin-sidebar-footer">
+          <div className="admin-user-card">
+            <div className="admin-user-avatar">
+              {user?.fullName
+                ?.charAt(0)
+                .toUpperCase()}
+            </div>
+
+            <div className="admin-user-info">
+              <strong>
+                {user?.fullName}
+              </strong>
+
+              <span>
+                Administrator
+              </span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="admin-logout-button"
+            onClick={logout}
+          >
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      <main className="admin-main">
+        <header className="admin-topbar">
+          <div>
+            <p className="eyebrow">
+              HR Administration
+            </p>
+
+            <h2>
+              {activeSection === "leaves"
+                ? "Leave Requests"
+                : "Employee Management"}
+            </h2>
+          </div>
+
+          <div className="admin-topbar-user">
+            <span>
+              Signed in as
+            </span>
+
+            <strong>
+              {user?.fullName}
+            </strong>
+          </div>
+        </header>
+
+        <div className="admin-content">
+          {activeSection === "leaves" && (
+            <>
+              <section className="admin-welcome">
+                <div>
+                  <h3>
+                    Leave Management Overview
+                  </h3>
+
+                  <p>
+                    Review employee leave
+                    requests and manage approval
+                    decisions from one place.
+                  </p>
+                </div>
+
+                <div className="admin-status-pill">
+                  <span />
+                  System Online
+                </div>
+              </section>
+
+              {message && (
+                <div
+                  className={`alert alert-${message.type}`}
+                >
+                  {message.text}
+                </div>
+              )}
+
+              <section className="stats-grid">
+                <article className="stat-card">
+                  <span>
+                    Total Requests
+                  </span>
+
+                  <strong>
+                    {requests.length}
+                  </strong>
+                </article>
+
+                <article className="stat-card">
+                  <span>
+                    Pending
+                  </span>
+
+                  <strong>
+                    {pending}
+                  </strong>
+                </article>
+
+                <article className="stat-card">
+                  <span>
+                    Approved
+                  </span>
+
+                  <strong>
+                    {approved}
+                  </strong>
+                </article>
+
+                <article className="stat-card">
+                  <span>
+                    Rejected
+                  </span>
+
+                  <strong>
+                    {rejected}
+                  </strong>
+                </article>
+              </section>
+
+              <AdminLeaveTable
+                requests={requests}
+                loading={loading}
+                actionId={actionId}
+                onStatusChange={
+                  handleStatusChange
+                }
+                onDelete={handleDelete}
+              />
+            </>
+          )}
+
+          {activeSection === "employees" && (
+            <EmployeeManagement />
+          )}
+        </div>
+      </main>
+    </div>
   );
 }
 
