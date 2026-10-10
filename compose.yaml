@@ -49,5 +49,19 @@ services:
     ports:
       - "8082:8082"
 
+
+  frontend:
+    build:
+      context: ./frontend
+
+    container_name: leaveflow-frontend
+    restart: unless-stopped
+
+    depends_on:
+      - backend
+
+    ports:
+      - "5173:80"
+
 volumes:
   leaveflow_mysql_data:
