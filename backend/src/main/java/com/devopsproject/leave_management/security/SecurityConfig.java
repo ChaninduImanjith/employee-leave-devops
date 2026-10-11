@@ -60,6 +60,11 @@ public class SecurityConfig {
                         ).permitAll()
 
                         .requestMatchers(
+                                "/actuator/health",
+                                "/actuator/health/**"
+                        ).permitAll()
+
+                        .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/auth/login"
                         ).permitAll()
