@@ -1,11 +1,14 @@
 import {
   useEffect,
+  useMemo,
   useState,
 } from "react";
 
 import LeaveForm from "../components/LeaveForm";
 import EmployeeLeaveTable from "../components/EmployeeLeaveTable";
+import LeaveBalanceCards from "../components/LeaveBalanceCards";
 import { useAuth } from "../hooks/useAuth";
+import { calculateBalances } from "../utils/leaveUtils";
 
 import {
   createLeaveRequest,
@@ -116,6 +119,10 @@ function EmployeeDashboard() {
       request.status === "APPROVED"
   ).length;
 
+  const balances = useMemo(() => {
+    return calculateBalances(requests);
+  }, [requests]);
+
   return (
     <main className="main-content">
       <section className="page-intro">
@@ -148,6 +155,8 @@ function EmployeeDashboard() {
         </div>
       )}
 
+      <LeaveBalanceCards balances={balances} />
+
       <section className="stats-grid employee-stats">
         <article className="stat-card">
           <span>My requests</span>
@@ -169,6 +178,7 @@ function EmployeeDashboard() {
         employee={employee}
         onSubmit={handleCreate}
         submitting={submitting}
+        balances={balances}
       />
 
       <EmployeeLeaveTable
