@@ -2339,3 +2339,240 @@ footer {
     font-size: 27px;
   }
 }
+
+/* ============================================================
+   Leave Balance Cards & Day Calculation UI
+   ============================================================ */
+
+.leave-balance-section {
+  border-top: 3px solid #10b981;
+}
+
+.balance-info-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.balance-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.balance-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--card-border, #e2e8f0);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.balance-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+.balance-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.balance-badge {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--card-accent, #0f172a);
+}
+
+.balance-quota-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #64748b;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.balance-numbers {
+  margin-bottom: 14px;
+}
+
+.balance-main-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.balance-main-stat strong {
+  font-size: 34px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.balance-main-stat span {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.balance-progress-wrapper {
+  margin-bottom: 16px;
+}
+
+.balance-progress-bar {
+  width: 100%;
+  height: 6px;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.balance-progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.4s ease;
+}
+
+.balance-progress-label {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.balance-breakdown {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  font-size: 12px;
+}
+
+.breakdown-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #64748b;
+}
+
+.breakdown-item strong {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.breakdown-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.approved-dot {
+  background: #10b981;
+}
+
+.pending-dot {
+  background: #f59e0b;
+}
+
+/* Day Duration Pill & Badges */
+.duration-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+  font-size: 13px;
+  font-weight: 500;
+  animation: fadeIn 0.25s ease;
+}
+
+.duration-pill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+.balance-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #059669;
+  font-weight: 500;
+}
+
+.form-warning-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+  animation: fadeIn 0.25s ease;
+}
+
+.form-warning-banner.exceed-warning {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.duration-tag {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1024px) {
+  .balance-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .balance-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
