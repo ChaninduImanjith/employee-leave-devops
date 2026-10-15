@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { calculateDays } from "../utils/leaveUtils";
 
 const initialForm = {
   leaveType: "",
@@ -7,20 +8,58 @@ const initialForm = {
   reason: "",
 };
 
-function LeaveForm({ employee, onSubmit, submitting }) {
+function LeaveForm({ employee, onSubmit, submitting, balances }) {
   const [formData, setFormData] = useState(initialForm);
+  const [dateError, setDateError] = useState("");
+
+  const todayStr = useMemo(() => {
+    return new Date().toISOString().split("T")[0];
+  }, []);
+
+  const requestedDays = useMemo(() => {
+    return calculateDays(formData.startDate, formData.endDate);
+  }, [formData.startDate, formData.endDate]);
+
+  const selectedBalance = useMemo(() => {
+    if (!balances || !formData.leaveType) return null;
+    return balances[formData.leaveType] || null;
+  }, [balances, formData.leaveType]);
+
+  const isExceedingBalance = useMemo(() => {
+    if (!selectedBalance || selectedBalance.remainingDays === null) return false;
+    return requestedDays > selectedBalance.remainingDays;
+  }, [selectedBalance, requestedDays]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
 
-    setFormData((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
+    setFormData((previous) => {
+      const updated = {
+        ...previous,
+        [name]: value,
+      };
+
+      if (updated.startDate && updated.endDate) {
+        if (new Date(updated.endDate) < new Date(updated.startDate)) {
+          setDateError("End date cannot be earlier than start date.");
+        } else {
+          setDateError("");
+        }
+      } else {
+        setDateError("");
+      }
+
+      return updated;
+    });
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (new Date(formData.endDate) < new Date(formData.startDate)) {
+      setDateError("End date cannot be earlier than start date.");
+      return;
+    }
 
     const success = await onSubmit({
       ...employee,
@@ -29,6 +68,7 @@ function LeaveForm({ employee, onSubmit, submitting }) {
 
     if (success) {
       setFormData(initialForm);
+      setDateError("");
     }
   };
 
@@ -39,6 +79,14 @@ function LeaveForm({ employee, onSubmit, submitting }) {
           <p className="eyebrow">New Request</p>
           <h2>Apply for leave</h2>
         </div>
+        {requestedDays > 0 && !dateError && (
+          <div className="duration-pill">
+            <span className="duration-pill-dot" />
+            <span>
+              Duration: <strong>{requestedDays} {requestedDays === 1 ? "Day" : "Days"}</strong>
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="employee-profile">
@@ -74,9 +122,20 @@ function LeaveForm({ employee, onSubmit, submitting }) {
               <option value="Sick Leave">Sick Leave</option>
               <option value="Unpaid Leave">Unpaid Leave</option>
             </select>
+            {selectedBalance && (
+              <span className="balance-hint">
+                {selectedBalance.remainingDays !== null ? (
+                  <>
+                    Available: <strong>{selectedBalance.remainingDays}</strong> / {selectedBalance.quota} days
+                  </>
+                ) : (
+                  <>Uncapped allowance</>
+                )}
+              </span>
+            )}
           </label>
 
-          <div></div>
+          <div />
 
           <label>
             Start date
@@ -85,6 +144,7 @@ function LeaveForm({ employee, onSubmit, submitting }) {
               name="startDate"
               value={formData.startDate}
               onChange={handleChange}
+              min={todayStr}
               required
             />
           </label>
@@ -96,11 +156,27 @@ function LeaveForm({ employee, onSubmit, submitting }) {
               name="endDate"
               value={formData.endDate}
               onChange={handleChange}
-              min={formData.startDate}
+              min={formData.startDate || todayStr}
               required
             />
           </label>
         </div>
+
+        {dateError && (
+          <div className="form-warning-banner" role="alert">
+            <span>⚠️</span>
+            <span>{dateError}</span>
+          </div>
+        )}
+
+        {isExceedingBalance && !dateError && (
+          <div className="form-warning-banner exceed-warning" role="alert">
+            <span>⚠️</span>
+            <span>
+              <strong>Balance Notice:</strong> You are requesting <strong>{requestedDays} days</strong>, but only have <strong>{selectedBalance.remainingDays} days</strong> remaining for {formData.leaveType}.
+            </span>
+          </div>
+        )}
 
         <label>
           Reason
@@ -117,11 +193,13 @@ function LeaveForm({ employee, onSubmit, submitting }) {
         <button
           className="primary-button"
           type="submit"
-          disabled={submitting}
+          disabled={submitting || Boolean(dateError)}
         >
           {submitting
             ? "Submitting..."
-            : "Submit leave request"}
+            : requestedDays > 0
+              ? `Submit leave request (${requestedDays} ${requestedDays === 1 ? "day" : "days"})`
+              : "Submit leave request"}
         </button>
       </form>
     </section>
