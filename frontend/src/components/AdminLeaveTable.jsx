@@ -1,3 +1,5 @@
+import { calculateDays } from "../utils/leaveUtils";
+
 function AdminLeaveTable({
   requests,
   loading,
@@ -76,6 +78,9 @@ function AdminLeaveTable({
                         <span>{request.startDate}</span>
                         <span>
                           to {request.endDate}
+                        </span>
+                        <span className="duration-tag">
+                          {calculateDays(request.startDate, request.endDate)} {calculateDays(request.startDate, request.endDate) === 1 ? "day" : "days"}
                         </span>
                       </div>
                     </td>
