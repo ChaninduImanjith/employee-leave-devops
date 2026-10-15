@@ -1,3 +1,5 @@
+import { calculateDays } from "../utils/leaveUtils";
+
 function EmployeeLeaveTable({ requests, loading }) {
   return (
     <section className="panel">
@@ -29,38 +31,49 @@ function EmployeeLeaveTable({ requests, loading }) {
               <tr>
                 <th>Leave Type</th>
                 <th>Period</th>
+                <th>Duration</th>
                 <th>Reason</th>
                 <th>Status</th>
               </tr>
             </thead>
 
             <tbody>
-              {requests.map((request) => (
-                <tr key={request.id}>
-                  <td>
-                    <strong>{request.leaveType}</strong>
-                  </td>
+              {requests.map((request) => {
+                const days = calculateDays(request.startDate, request.endDate);
 
-                  <td>
-                    <div className="date-cell">
-                      <span>{request.startDate}</span>
-                      <span>to {request.endDate}</span>
-                    </div>
-                  </td>
+                return (
+                  <tr key={request.id}>
+                    <td>
+                      <strong>{request.leaveType}</strong>
+                    </td>
 
-                  <td>
-                    {request.reason || "No reason provided"}
-                  </td>
+                    <td>
+                      <div className="date-cell">
+                        <span>{request.startDate}</span>
+                        <span>to {request.endDate}</span>
+                      </div>
+                    </td>
 
-                  <td>
-                    <span
-                      className={`status-badge status-${request.status.toLowerCase()}`}
-                    >
-                      {request.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+                    <td>
+                      <span className="duration-tag">
+                        {days} {days === 1 ? "day" : "days"}
+                      </span>
+                    </td>
+
+                    <td>
+                      {request.reason || "No reason provided"}
+                    </td>
+
+                    <td>
+                      <span
+                        className={`status-badge status-${request.status.toLowerCase()}`}
+                      >
+                        {request.status}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
