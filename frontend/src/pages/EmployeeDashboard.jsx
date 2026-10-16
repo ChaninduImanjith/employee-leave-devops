@@ -8,11 +8,12 @@ import LeaveForm from "../components/LeaveForm";
 import EmployeeLeaveTable from "../components/EmployeeLeaveTable";
 import LeaveBalanceCards from "../components/LeaveBalanceCards";
 import { useAuth } from "../hooks/useAuth";
-import { calculateBalances } from "../utils/leaveUtils";
+import { calculateBalances, formatServerBalances } from "../utils/leaveUtils";
 
 import {
   createLeaveRequest,
   getMyLeaveRequests,
+  getMyLeaveBalances,
 } from "../services/leaveService";
 
 function EmployeeDashboard() {
@@ -23,6 +24,7 @@ function EmployeeDashboard() {
   } = useAuth();
 
   const [requests, setRequests] = useState([]);
+  const [serverBalances, setServerBalances] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState(null);
@@ -40,10 +42,16 @@ function EmployeeDashboard() {
 
     let cancelled = false;
 
-    getMyLeaveRequests(accessToken)
-      .then((data) => {
+    Promise.all([
+      getMyLeaveRequests(accessToken),
+      getMyLeaveBalances(accessToken).catch(() => null),
+    ])
+      .then(([requestsData, balancesData]) => {
         if (!cancelled) {
-          setRequests(data);
+          setRequests(requestsData);
+          if (balancesData) {
+            setServerBalances(formatServerBalances(balancesData));
+          }
         }
       })
       .catch((error) => {
@@ -84,16 +92,20 @@ function EmployeeDashboard() {
         reason: formData.reason,
       };
 
-      const created =
-        await createLeaveRequest(
-          secureRequest,
-          accessToken
-        );
+      await createLeaveRequest(
+        secureRequest,
+        accessToken
+      );
 
-      setRequests((previous) => [
-        created,
-        ...previous,
+      const [requestsData, balancesData] = await Promise.all([
+        getMyLeaveRequests(accessToken),
+        getMyLeaveBalances(accessToken).catch(() => null),
       ]);
+
+      setRequests(requestsData);
+      if (balancesData) {
+        setServerBalances(formatServerBalances(balancesData));
+      }
 
       showMessage(
         "success",
@@ -120,8 +132,8 @@ function EmployeeDashboard() {
   ).length;
 
   const balances = useMemo(() => {
-    return calculateBalances(requests);
-  }, [requests]);
+    return serverBalances || calculateBalances(requests);
+  }, [serverBalances, requests]);
 
   return (
     <main className="main-content">
