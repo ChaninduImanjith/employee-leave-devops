@@ -106,3 +106,34 @@ export function calculateBalances(requests = []) {
 
   return summary;
 }
+
+/**
+ * Decorates server-provided balance map with frontend presentation themes.
+ */
+export function formatServerBalances(serverBalances) {
+  if (!serverBalances) {
+    return null;
+  }
+
+  const summary = {};
+
+  Object.keys(serverBalances).forEach((type) => {
+    const item = serverBalances[type];
+    const config = LEAVE_CONFIG[type] || {
+      color: "#6b7280",
+      bgColor: "#f3f4f6",
+      borderColor: "#e5e7eb",
+      description: "",
+    };
+
+    summary[type] = {
+      ...item,
+      color: config.color,
+      bgColor: config.bgColor,
+      borderColor: config.borderColor,
+      description: config.description,
+    };
+  });
+
+  return summary;
+}
