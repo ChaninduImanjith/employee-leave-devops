@@ -1,6 +1,7 @@
 package com.devopsproject.leave_management.service;
 
 import com.devopsproject.leave_management.dto.CreateLeaveRequestRequest;
+import com.devopsproject.leave_management.dto.LeaveBalanceDto;
 import com.devopsproject.leave_management.entity.LeaveRequest;
 import com.devopsproject.leave_management.exception.ResourceNotFoundException;
 import com.devopsproject.leave_management.repository.LeaveRequestRepository;
@@ -8,7 +9,9 @@ import com.devopsproject.leave_management.user.UserAccount;
 import com.devopsproject.leave_management.user.UserAccountRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -16,13 +19,16 @@ public class LeaveRequestService {
 
     private final LeaveRequestRepository leaveRequestRepository;
     private final UserAccountRepository userAccountRepository;
+    private final LeaveBalanceService leaveBalanceService;
 
     public LeaveRequestService(
             LeaveRequestRepository leaveRequestRepository,
-            UserAccountRepository userAccountRepository) {
+            UserAccountRepository userAccountRepository,
+            LeaveBalanceService leaveBalanceService) {
 
         this.leaveRequestRepository = leaveRequestRepository;
         this.userAccountRepository = userAccountRepository;
+        this.leaveBalanceService = leaveBalanceService;
     }
 
     public LeaveRequest createLeaveRequest(
@@ -43,6 +49,12 @@ public class LeaveRequestService {
         leaveRequest.setStatus("PENDING");
 
         validateDateRange(leaveRequest);
+        leaveBalanceService.validateLeaveQuota(
+                user.getEmployeeId(),
+                request.getLeaveType(),
+                request.getStartDate(),
+                request.getEndDate()
+        );
 
         return leaveRequestRepository.save(leaveRequest);
     }
@@ -141,9 +153,27 @@ public class LeaveRequestService {
             );
         }
 
+        if ("APPROVED".equals(normalizedStatus)) {
+            leaveBalanceService.validateApprovalQuota(leaveRequest);
+        }
+
         leaveRequest.setStatus(normalizedStatus);
 
         return leaveRequestRepository.save(leaveRequest);
+    }
+
+    public Map<String, LeaveBalanceDto> getMyLeaveBalances(String email) {
+        UserAccount user = getAuthenticatedEmployee(email);
+        int currentYear = LocalDate.now().getYear();
+        return leaveBalanceService.getBalancesForEmployee(user.getEmployeeId(), currentYear);
+    }
+
+    public Map<String, LeaveBalanceDto> getEmployeeLeaveBalances(String employeeId) {
+        if (employeeId == null || employeeId.isBlank()) {
+            throw new IllegalArgumentException("Employee ID cannot be empty");
+        }
+        int currentYear = LocalDate.now().getYear();
+        return leaveBalanceService.getBalancesForEmployee(employeeId, currentYear);
     }
 
     public void deleteLeaveRequest(Long id) {
