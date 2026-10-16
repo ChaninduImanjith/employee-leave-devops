@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,6 +31,9 @@ class LeaveRequestServiceTest {
 
     @Mock
     private UserAccountRepository userAccountRepository;
+
+    @Mock
+    private LeaveBalanceService leaveBalanceService;
 
     @InjectMocks
     private LeaveRequestService leaveRequestService;
@@ -147,6 +151,40 @@ class LeaveRequestServiceTest {
         leaveRequestService.deleteLeaveRequest(10L);
 
         verify(leaveRequestRepository, times(1)).deleteById(10L);
+    }
+
+    @Test
+    void createLeaveRequest_InsufficientBalance_ThrowsException() {
+        CreateLeaveRequestRequest request = new CreateLeaveRequestRequest();
+        request.setLeaveType("ANNUAL");
+        request.setStartDate(LocalDate.of(2026, 11, 1));
+        request.setEndDate(LocalDate.of(2026, 11, 20));
+
+        when(userAccountRepository.findByEmail("john@leaveflow.com"))
+                .thenReturn(Optional.of(testUser));
+        doThrow(new com.devopsproject.leave_management.exception.InsufficientLeaveBalanceException("Insufficient balance"))
+                .when(leaveBalanceService)
+                .validateLeaveQuota(eq("EMP001"), eq("ANNUAL"), any(LocalDate.class), any(LocalDate.class));
+
+        assertThrows(
+                com.devopsproject.leave_management.exception.InsufficientLeaveBalanceException.class,
+                () -> leaveRequestService.createLeaveRequest(request, "john@leaveflow.com")
+        );
+        verify(leaveRequestRepository, never()).save(any(LeaveRequest.class));
+    }
+
+    @Test
+    void getMyLeaveBalances_Success() {
+        when(userAccountRepository.findByEmail("john@leaveflow.com"))
+                .thenReturn(Optional.of(testUser));
+        when(leaveBalanceService.getBalancesForEmployee(eq("EMP001"), anyInt()))
+                .thenReturn(Map.of());
+
+        Map<String, com.devopsproject.leave_management.dto.LeaveBalanceDto> balances =
+                leaveRequestService.getMyLeaveBalances("john@leaveflow.com");
+
+        assertNotNull(balances);
+        verify(leaveBalanceService).getBalancesForEmployee(eq("EMP001"), anyInt());
     }
 
     @Test
