@@ -57,6 +57,30 @@ public class LeaveRequestController {
         );
     }
 
+    @GetMapping("/balances")
+    public ResponseEntity<java.util.Map<String, com.devopsproject.leave_management.dto.LeaveBalanceDto>>
+    getMyLeaveBalances(
+            @AuthenticationPrincipal Jwt jwt) {
+
+        return ResponseEntity.ok(
+                leaveRequestService.getMyLeaveBalances(
+                        jwt.getSubject()
+                )
+        );
+    }
+
+    @GetMapping("/balances/{employeeId}")
+    public ResponseEntity<java.util.Map<String, com.devopsproject.leave_management.dto.LeaveBalanceDto>>
+    getEmployeeLeaveBalances(
+            @PathVariable String employeeId) {
+
+        return ResponseEntity.ok(
+                leaveRequestService.getEmployeeLeaveBalances(
+                        employeeId
+                )
+        );
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<LeaveRequest>
     getLeaveRequestById(
