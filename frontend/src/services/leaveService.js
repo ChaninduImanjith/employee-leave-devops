@@ -105,3 +105,30 @@ export async function deleteLeaveRequest(
 
   return handleResponse(response);
 }
+
+export async function getMyLeaveBalances(
+  accessToken
+) {
+  const response = await fetch(
+    `${API_URL}/balances`,
+    {
+      headers: getAuthHeaders(accessToken),
+    }
+  );
+
+  return handleResponse(response);
+}
+
+export async function getEmployeeLeaveBalances(
+  employeeId,
+  accessToken
+) {
+  const response = await fetch(
+    `${API_URL}/balances/${encodeURIComponent(employeeId)}`,
+    {
+      headers: getAuthHeaders(accessToken),
+    }
+  );
+
+  return handleResponse(response);
+}
