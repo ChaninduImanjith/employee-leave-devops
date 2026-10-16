@@ -61,6 +61,10 @@ function LeaveForm({ employee, onSubmit, submitting, balances }) {
       return;
     }
 
+    if (isExceedingBalance) {
+      return;
+    }
+
     const success = await onSubmit({
       ...employee,
       ...formData,
@@ -193,13 +197,15 @@ function LeaveForm({ employee, onSubmit, submitting, balances }) {
         <button
           className="primary-button"
           type="submit"
-          disabled={submitting || Boolean(dateError)}
+          disabled={submitting || Boolean(dateError) || isExceedingBalance}
         >
           {submitting
             ? "Submitting..."
-            : requestedDays > 0
-              ? `Submit leave request (${requestedDays} ${requestedDays === 1 ? "day" : "days"})`
-              : "Submit leave request"}
+            : isExceedingBalance
+              ? "Exceeds Available Quota"
+              : requestedDays > 0
+                ? `Submit leave request (${requestedDays} ${requestedDays === 1 ? "day" : "days"})`
+                : "Submit leave request"}
         </button>
       </form>
     </section>
