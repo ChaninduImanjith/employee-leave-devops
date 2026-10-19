@@ -385,7 +385,7 @@ npm run build
 
 ---
 
-## 👤 Author & Maintenance
+## 👤 Author and Maintenance
 
 **Chanindu Imanjith**
 - GitHub: [@ChaninduImanjith](https://github.com/ChaninduImanjith)
